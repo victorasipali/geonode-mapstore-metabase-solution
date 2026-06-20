@@ -141,3 +141,8 @@ if LDAP_ENABLED and 'geonode_ldap' not in INSTALLED_APPS:
 
 # Add your specific LDAP configuration after this comment:
 # https://docs.geonode.org/en/master/advanced/contrib/#configuration
+
+
+# Metabase embedding
+METABASE_SITE_URL = os.getenv('METABASE_SITE_URL', 'http://localhost:3000')
+METABASE_SECRET_KEY = os.getenv('METABASE_SECRET_KEY', '')

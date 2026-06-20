@@ -1,0 +1,49 @@
+{% extends "geonode-mapstore-client/catalogue.html" %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    .metabase-container {
+        padding: 20px;
+        background: #f4f7fa;
+        min-height: calc(100vh - 70px);
+    }
+    .metabase-header {
+        margin-bottom: 16px;
+    }
+    .metabase-header h2 {
+        font-size: 1.5rem;
+        color: #1a2733;
+        font-weight: 600;
+        margin: 0 0 4px 0;
+    }
+    .metabase-header p {
+        color: #5b6b78;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+    .metabase-frame {
+        width: 100%;
+        height: 80vh;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        background: #ffffff;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="metabase-container">
+    <div class="metabase-header">
+        <h2>GeoNode Analytics Dashboard</h2>
+        <p>Layer inventory and resource statistics powered by Metabase</p>
+    </div>
+    <iframe
+        class="metabase-frame"
+        src="{{ metabase_url }}"
+        allowtransparency>
+    </iframe>
+</div>
+{% endblock %}

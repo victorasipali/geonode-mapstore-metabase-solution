@@ -1,0 +1,17 @@
+{% extends "geonode-mapstore-client/snippets/brand_navbar.html" %}
+{% load static %}
+
+{% block extra_style %}
+<style>
+    #{{ id|default:'' }} .gn-menu-content-left img {
+        height: 44px;
+        width: auto;
+        max-width: none;
+        border-radius: 50%;
+    }
+</style>
+{% endblock %}
+
+{% block logo_src %}
+    {% static 'img/navbar-logo.png' %}
+{% endblock %}
