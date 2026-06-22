@@ -157,3 +157,49 @@ FACET_PROVIDERS = [
     'my_geonode.facets.GroupFacetProvider',
     'my_geonode.facets.GroupCategoryFacetProvider',
 ]
+
+# Satellite basemap as default - Esri World Imagery (no API key required)
+MAPSTORE_BASELAYERS = [
+    {
+        "type": "tileprovider",
+        "title": "Satellite Imagery (Esri)",
+        "provider": "custom",
+        "name": "esri_satellite",
+        "source": "esri",
+        "group": "background",
+        "visibility": True,
+        "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        "options": {
+            "subdomains": [],
+            "attribution": "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+        }
+    },
+    {
+        "type": "osm",
+        "title": "Open Street Map",
+        "name": "mapnik",
+        "source": "osm",
+        "group": "background",
+        "visibility": False
+    },
+    {
+        "type": "wms",
+        "title": "Sentinel-2 cloudless",
+        "format": "image/jpeg",
+        "id": "s2cloudless",
+        "name": "s2cloudless:s2cloudless",
+        "url": "https://maps.geosolutionsgroup.com/geoserver/wms",
+        "group": "background",
+        "visibility": False
+    },
+    {
+        "source": "ol",
+        "group": "background",
+        "id": "none",
+        "name": "empty",
+        "title": "Empty Background",
+        "type": "empty",
+        "visibility": False,
+        "args": ["Empty Background", {"visibility": False}]
+    }
+]
