@@ -146,3 +146,14 @@ if LDAP_ENABLED and 'geonode_ldap' not in INSTALLED_APPS:
 # Metabase embedding
 METABASE_SITE_URL = os.getenv('METABASE_SITE_URL', 'http://localhost:3000')
 METABASE_SECRET_KEY = os.getenv('METABASE_SECRET_KEY', '')
+
+# Default map view - centered on Papua New Guinea
+DEFAULT_MAP_CENTER_X = 16519812.43
+DEFAULT_MAP_CENTER_Y = -747546.23
+DEFAULT_MAP_ZOOM = 6
+
+# Custom facet providers - only our implementations exist in GeoNode 4.1.x
+FACET_PROVIDERS = [
+    'my_geonode.facets.GroupFacetProvider',
+    'my_geonode.facets.GroupCategoryFacetProvider',
+]
