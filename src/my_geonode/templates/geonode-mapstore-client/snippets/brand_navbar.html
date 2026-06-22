@@ -9,9 +9,33 @@
         max-width: none;
         border-radius: 50%;
     }
+    .gn-themes-link {
+        color: #c8a951 !important;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-decoration: none;
+        padding: 6px 12px;
+        border: 1px solid #c8a951;
+        border-radius: 4px;
+        margin-right: 8px;
+        transition: all 0.15s;
+    }
+    .gn-themes-link:hover {
+        background: #c8a951;
+        color: #0a1420 !important;
+    }
 </style>
 {% endblock %}
 
 {% block logo_src %}
     {% static 'img/navbar-logo.png' %}
+{% endblock %}
+
+{% block right_menu %}
+<ul class="gn-menu-list" style="display:flex;align-items:center">
+    <li>
+        <a href="/themes/" class="gn-themes-link">&#128193; Browse Themes</a>
+    </li>
+    {{ block.super }}
+</ul>
 {% endblock %}
