@@ -6,65 +6,50 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Browse by Theme - CCDA GeoPortal</title>
 <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
-<link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
-<link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100vh;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0f1c2e;color:#d4dce4}
-/* Header */
+html,body{height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0f1c2e;color:#d4dce4;display:flex;flex-direction:column;overflow:hidden}
 .hdr{background:#0a1420;border-bottom:2px solid #c8a951;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
 .hdr-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
 .hdr-logo img{height:30px;border-radius:50%}
 .hdr-logo span{color:#e8edf2;font-weight:600;font-size:.9rem}
 .hdr-nav a{color:#aab8c8;text-decoration:none;font-size:.82rem;padding:5px 9px;border-radius:4px;margin-left:3px}
 .hdr-nav a:hover,.hdr-nav a.active{color:#c8a951}
-/* Page bar */
-.pbar{background:#0a1420;border-bottom:1px solid #1c2d42;height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
+.pbar{background:#0a1420;border-bottom:1px solid #1c2d42;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
 .pbar h1{color:#e8edf2;font-size:.88rem;font-weight:600}
 .pbar a{color:#c8a951;text-decoration:none;font-size:.75rem}
-/* Layout */
-.wrap{display:flex;height:calc(100vh - 84px)}
+.wrap{display:flex;flex:1;min-height:0}
 /* Sidebar */
 .sb{width:270px;min-width:270px;background:#0b1825;border-right:1px solid #1c2d42;overflow-y:auto;flex-shrink:0}
 .sb-title{padding:8px 12px;color:#6b7d91;font-size:.7rem;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid #1c2d42}
-/* Category row */
 .cat-row{display:flex;align-items:center;padding:7px 10px;cursor:pointer;border-left:3px solid transparent;user-select:none}
-.cat-row:hover{background:#1c2d42;border-left-color:#c8a951}
-.cat-row.open{background:#0f1e2e;border-left-color:#c8a951}
+.cat-row:hover,.cat-row.open{background:#1c2d42;border-left-color:#c8a951}
 .cat-arrow{color:#c8a951;font-size:.6rem;width:12px;transition:transform .2s;flex-shrink:0}
 .cat-arrow.open{transform:rotate(90deg)}
 .cat-label{color:#e8edf2;font-weight:600;font-size:.82rem;flex:1;margin-left:6px}
 .cat-cnt{background:#c8a951;color:#0a1420;font-size:.62rem;font-weight:700;padding:1px 5px;border-radius:6px}
-/* Group row */
 .grp-rows{display:none;background:#0d1a28}
 .grp-rows.open{display:block}
 .grp-row{display:flex;align-items:center;padding:5px 10px 5px 22px;cursor:pointer;border-left:3px solid transparent;user-select:none}
-.grp-row:hover{background:#1c2d42;border-left-color:#4f8fc0}
-.grp-row.open{background:#0f1e2e;border-left-color:#4f8fc0}
+.grp-row:hover,.grp-row.open{background:#1c2d42;border-left-color:#4f8fc0}
 .grp-arrow{color:#6b7d91;font-size:.6rem;width:12px;transition:transform .2s;flex-shrink:0}
 .grp-arrow.open{transform:rotate(90deg)}
 .grp-label{color:#aab8c8;font-size:.78rem;flex:1;margin-left:5px}
 .grp-cnt{font-size:.62rem;padding:1px 4px;border-radius:4px;background:#1c2d42;color:#6b7d91}
 .grp-cnt.has{color:#c8a951;background:rgba(200,169,81,.2)}
-/* Layer rows */
 .lyr-rows{display:none;background:#0a1520}
 .lyr-rows.open{display:block}
 .lyr-row{padding:5px 10px 5px 32px;border-left:3px solid transparent;border-bottom:1px solid rgba(28,45,66,.5)}
 .lyr-row:hover{background:#1c2d42}
-/* Layer top line: checkbox + legend swatch + name */
 .lyr-top{display:flex;align-items:center;gap:6px}
 .lyr-cb{accent-color:#c8a951;width:13px;height:13px;cursor:pointer;flex-shrink:0}
 .lyr-swatch{width:16px;height:16px;border-radius:2px;border:1px solid #2a3848;flex-shrink:0;background:#888}
 .lyr-name{color:#d4dce4;font-size:.76rem;flex:1;cursor:pointer}
 .lyr-name:hover{color:#c8a951}
-/* Legend expand */
-.lyr-legend{margin-top:4px;padding-left:20px;display:none}
-.lyr-legend.show{display:block}
-.lyr-legend img{max-width:180px;border:1px solid #1c2d42;border-radius:3px}
-.lyr-legend-label{color:#6b7d91;font-size:.68rem;margin-top:2px}
-/* Opacity slider */
+.lyr-info-btn{color:#6b7d91;cursor:pointer;font-size:.72rem;flex-shrink:0;background:none;border:none;padding:0 2px}
+.lyr-info-btn:hover{color:#c8a951}
 .lyr-opacity{margin-top:4px;padding-left:20px;display:none;align-items:center;gap:6px}
 .lyr-opacity.show{display:flex}
 .lyr-opacity input[type=range]{flex:1;accent-color:#c8a951;height:3px}
@@ -72,9 +57,29 @@ html,body{height:100vh;overflow:hidden;font-family:-apple-system,BlinkMacSystemF
 /* Map */
 .mp{flex:1;position:relative}
 #map{position:absolute;inset:0}
-/* Map overlay info */
-.map-tip{position:absolute;bottom:30px;left:10px;z-index:1000;background:rgba(10,20,32,.85);border:1px solid #1c2d42;border-radius:5px;padding:6px 10px;font-size:.72rem;color:#aab8c8;pointer-events:none;display:none}
-.map-tip.show{display:block}
+/* TOP-RIGHT: Info box - small, appears when info icon clicked */
+.info-panel{position:absolute;top:10px;right:10px;z-index:1000;background:rgba(10,20,32,.93);border:1px solid #1c2d42;border-radius:6px;padding:10px 12px;width:220px;display:none}
+.info-panel.show{display:block}
+.info-panel-title{color:#c8a951;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.info-panel-close{color:#6b7d91;cursor:pointer;font-size:.8rem;background:none;border:none;padding:0}
+.info-panel-close:hover{color:#fff}
+.info-panel h3{color:#e8edf2;font-size:.82rem;font-weight:600;margin-bottom:6px;line-height:1.3}
+.info-panel p{color:#aab8c8;font-size:.75rem;line-height:1.5;max-height:120px;overflow-y:auto}
+.info-panel a{color:#c8a951;font-size:.7rem;text-decoration:none;display:inline-block;margin-top:6px}
+.info-panel a:hover{text-decoration:underline}
+/* BOTTOM-LEFT: Active layers - compact */
+.active-panel{position:absolute;bottom:30px;left:10px;z-index:1000;background:rgba(10,20,32,.93);border:1px solid #1c2d42;border-radius:6px;padding:8px 10px;min-width:160px;max-width:220px;display:none}
+.active-panel.show{display:block}
+.active-panel-title{color:#4f8fc0;font-size:.7rem;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.al-item{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.al-item:last-child{margin-bottom:0}
+.al-swatch{width:12px;height:12px;border-radius:2px;flex-shrink:0;border:1px solid rgba(255,255,255,.15)}
+.al-info{flex:1}
+.al-name{color:#d4dce4;font-size:.73rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.al-link{color:#c8a951;font-size:.65rem;text-decoration:none}
+.al-link:hover{text-decoration:underline}
+/* Footer */
+.ftr{background:#0a1420;border-top:1px solid #1c2d42;padding:6px 20px;display:flex;align-items:center;justify-content:space-between;font-size:.72rem;flex-shrink:0}
 /* Leaflet */
 .leaflet-control-attribution{background:rgba(10,20,32,.7)!important;color:#6b7d91!important;font-size:.6rem!important}
 .leaflet-control-attribution a{color:#c8a951!important}
@@ -95,7 +100,7 @@ html,body{height:100vh;overflow:hidden;font-family:-apple-system,BlinkMacSystemF
   </nav>
 </header>
 <div class="pbar">
-  <h1>&#128193; Browse by Theme &nbsp;<span style="color:#6b7d91;font-weight:400;font-size:.75rem">— select layers to display on map</span></h1>
+  <h1>&#128193; Browse by Theme <span style="color:#6b7d91;font-weight:400;font-size:.75rem">— select layers to display on map</span></h1>
   <a href="/catalogue/">&#8592; Catalogue</a>
 </div>
 <div class="wrap">
@@ -118,17 +123,14 @@ html,body{height:100vh;overflow:hidden;font-family:-apple-system,BlinkMacSystemF
           </div>
           <div class="lyr-rows" id="g{{gd.profile.slug|cut:"-"}}">
             {% for l in gd.layers %}
-            <div class="lyr-row" id="row-{{l.id}}">
+            <div class="lyr-row">
               <div class="lyr-top">
                 <input class="lyr-cb" type="checkbox" id="cb-{{l.id}}"
                   onchange="toggleLayer(this,'{{l.id}}','geonode:{{l.name}}','{{l.title|escapejs}}')"
-                  data-layer-id="{{l.id}}" data-layer-name="geonode:{{l.name}}">
+                  data-url="/catalogue/#/dataset/{{l.id}}" data-abstract="{{l.abstract|escapejs}}">
                 <div class="lyr-swatch" id="sw-{{l.id}}"></div>
-                <label class="lyr-name" for="cb-{{l.id}}" title="{{l.title}}">{{l.title}}</label>
-              </div>
-              <div class="lyr-legend" id="leg-{{l.id}}">
-                <img src="" id="legimg-{{l.id}}" alt="legend">
-                <div class="lyr-legend-label" id="legtxt-{{l.id}}"></div>
+                <label class="lyr-name" for="cb-{{l.id}}">{{l.title}}</label>
+                <button class="lyr-info-btn" onclick="showInfo('{{l.title|escapejs}}','{{l.abstract|escapejs}}','/catalogue/#/dataset/{{l.id}}')">&#9432;</button>
               </div>
               <div class="lyr-opacity" id="opc-{{l.id}}">
                 <input type="range" min="0" max="100" value="85"
@@ -148,107 +150,139 @@ html,body{height:100vh;overflow:hidden;font-family:-apple-system,BlinkMacSystemF
   </div>
   <div class="mp">
     <div id="map"></div>
-    <div class="map-tip" id="mapTip"></div>
+    <!-- TOP-RIGHT: Info box -->
+    <div class="info-panel" id="infoPanel">
+      <div class="info-panel-title">
+        <span>&#9432; Layer Info</span>
+        <button class="info-panel-close" onclick="document.getElementById('infoPanel').classList.remove('show')">&#10005;</button>
+      </div>
+      <h3 id="infoPanelTitle"></h3>
+      <p id="infoPanelBody"></p>
+      <a id="infoPanelLink" href="#" target="_blank"></a>
+    </div>
+    <!-- BOTTOM-LEFT: Active layers -->
+    <div class="active-panel" id="activePanel">
+      <div class="active-panel-title">&#10003; Active Layers</div>
+      <div id="activeItems"></div>
+    </div>
   </div>
 </div>
-
+<footer class="ftr">
+  <div>
+    <a href="/catalogue/" style="color:#c8a951;text-decoration:none;margin-right:16px">Catalogue</a>
+    <a href="/about/" style="color:#6b7d91;text-decoration:none;margin-right:16px">About</a>
+    <a href="/contact/" style="color:#6b7d91;text-decoration:none">Contact</a>
+  </div>
+  <div style="color:#4a5868">&copy; 2026 CCDA GeoPortal</div>
+</footer>
+<script id="theme-data" type="application/json">{{ theme_data_json|safe }}</script>
 <script>
-const GS = "http://192.168.2.16/geoserver/ows";
-const activeLayers = {};
-const layerColors = {};
-const COLORS = ["#FFD700","#00FF88","#FF6B6B","#4FC3F7","#FF8A65","#CE93D8","#80CBC4","#FFCC02","#69F0AE","#FF4081"];
-let colorIdx = 0;
+var D = JSON.parse(document.getElementById("theme-data").textContent);
+var GS = "http://192.168.2.16/geoserver/ows";
+var activeLayers = {};
+var layerColors = {};
+var COLORS = ["#FFD700","#00FF88","#FF6B6B","#4FC3F7","#FF8A65","#CE93D8","#80CBC4","#FFCC02","#69F0AE","#FF4081"];
+var colorIdx = 0;
+var styleMap = {
+  "geonode:biodiversity_priority_areas":"biodiversity_areas",
+  "geonode:gadm41_PNG_0":"png_national",
+  "geonode:gadm41_PNG_1":"png_provinces",
+  "geonode:gadm41_PNG_2":"png_provinces"
+};
 
-// Init map
-document.getElementById("map").style.height = (window.innerHeight - 84) + "px";
-window.addEventListener("resize", () => {
-  document.getElementById("map").style.height = (window.innerHeight - 84) + "px";
+document.getElementById("map").style.height = (window.innerHeight - 90) + "px";
+window.addEventListener("resize", function() {
+  document.getElementById("map").style.height = (window.innerHeight - 90) + "px";
   map.invalidateSize();
 });
 
-const map = L.map("map", {center:[-6.5,147],zoom:6,zoomControl:false});
+var map = L.map("map", {center:[-6.5,147],zoom:6,zoomControl:false});
 L.control.zoom({position:"bottomright"}).addTo(map);
-
-// Satellite basemap
 L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
   {attribution:"Tiles &copy; Esri",maxZoom:18}).addTo(map);
-
-// Province boundaries always on
 L.tileLayer.wms(GS, {
-  layers:"geonode:gadm41_PNG_1", styles:"png_provinces",
-  format:"image/png", transparent:true, version:"1.1.1", opacity:1
+  layers:"geonode:gadm41_PNG_1",styles:"png_provinces",
+  format:"image/png",transparent:true,version:"1.1.1",opacity:1
 }).addTo(map);
 
 function toggleCat(el, id) {
-  const rows = document.getElementById(id);
-  const arrow = el.querySelector(".cat-arrow");
-  const open = rows.classList.toggle("open");
+  var rows = document.getElementById(id);
+  var arrow = el.querySelector(".cat-arrow");
+  var open = rows.classList.toggle("open");
   arrow.classList.toggle("open", open);
   el.classList.toggle("open", open);
 }
 
 function toggleGrp(el, id) {
-  const rows = document.getElementById(id);
-  const arrow = el.querySelector(".grp-arrow");
-  const open = rows.classList.toggle("open");
+  var rows = document.getElementById(id);
+  var arrow = el.querySelector(".grp-arrow");
+  var open = rows.classList.toggle("open");
   arrow.classList.toggle("open", open);
   el.classList.toggle("open", open);
 }
 
 function toggleLayer(cb, layerId, layerName, layerTitle) {
   if (cb.checked) {
-    const color = COLORS[colorIdx % COLORS.length];
+    var color = COLORS[colorIdx % COLORS.length];
     colorIdx++;
     layerColors[layerId] = color;
-
-    // Color swatch
     document.getElementById("sw-" + layerId).style.background = color;
-
-    // Add WMS layer
-    // Get the style name from data attribute
-    const styleMap = {
-      "geonode:biodiversity_priority_areas": "biodiversity_areas",
-      "geonode:gadm41_PNG_0": "png_national",
-      "geonode:gadm41_PNG_1": "png_provinces",
-      "geonode:gadm41_PNG_2": "png_provinces"
-    };
-    const styleName = styleMap[layerName] || "";
-    const wmsLayer = L.tileLayer.wms(GS, {
-      layers: layerName, styles: styleName,
-      format:"image/png", transparent:true,
-      version:"1.1.1", opacity:0.85
+    var styleName = styleMap[layerName] || "";
+    var wmsLayer = L.tileLayer.wms(GS, {
+      layers:layerName, styles:styleName,
+      format:"image/png", transparent:true, version:"1.1.1", opacity:0.85
     });
     wmsLayer.addTo(map);
     activeLayers[layerId] = wmsLayer;
-
-    // Show legend image from GeoServer
-    const legImg = document.getElementById("legimg-" + layerId);
-    legImg.src = `${GS}?service=WMS&version=1.1.1&request=GetLegendGraphic&layer=${layerName}&format=image/png&width=120&height=20&legend_options=fontName:Arial;fontSize:9;fontColor:0xffffff;bgColor:0x0a1420;dpi:90`;
-    legImg.onerror = function() { this.style.display="none"; };
-    document.getElementById("legtxt-" + layerId).textContent = layerTitle;
-    document.getElementById("leg-" + layerId).classList.add("show");
     document.getElementById("opc-" + layerId).classList.add("show");
-
-    // Map tip
-    const tip = document.getElementById("mapTip");
-    tip.textContent = "Loaded: " + layerTitle;
-    tip.classList.add("show");
-    setTimeout(() => tip.classList.remove("show"), 3000);
-
+    // Auto-show info panel for this layer
+    var cbEl = document.getElementById("cb-" + layerId);
+    var lbl = document.querySelector("label[for='cb-" + layerId + "']");
+    var lyrTitle = lbl ? lbl.textContent.trim() : layerTitle;
+    var lyrUrl = cbEl ? (cbEl.getAttribute("data-url") || "#") : "#";
+    var lyrAbstract = cbEl ? (cbEl.getAttribute("data-abstract") || "") : "";
+    showInfo(lyrTitle, lyrAbstract, lyrUrl);
   } else {
-    // Remove layer
-    if (activeLayers[layerId]) {
-      map.removeLayer(activeLayers[layerId]);
-      delete activeLayers[layerId];
-    }
+    if (activeLayers[layerId]) { map.removeLayer(activeLayers[layerId]); delete activeLayers[layerId]; }
+    delete layerColors[layerId];
     document.getElementById("sw-" + layerId).style.background = "#888";
-    document.getElementById("leg-" + layerId).classList.remove("show");
     document.getElementById("opc-" + layerId).classList.remove("show");
   }
+  updateActivePanel();
 }
 
 function setOpacity(layerId, val) {
   if (activeLayers[layerId]) activeLayers[layerId].setOpacity(val);
+}
+
+function showInfo(title, abstract, url) {
+  document.getElementById("infoPanelTitle").textContent = title;
+  document.getElementById("infoPanelBody").textContent = abstract || "No description available.";
+  var link = document.getElementById("infoPanelLink");
+  link.href = url || "#";
+  link.textContent = url ? "View full dataset" : "";
+  document.getElementById("infoPanel").classList.add("show");
+}
+
+function updateActivePanel() {
+  var panel = document.getElementById("activePanel");
+  var items = document.getElementById("activeItems");
+  var activeKeys = Object.keys(activeLayers);
+  if (activeKeys.length === 0) { panel.classList.remove("show"); return; }
+  items.innerHTML = "";
+  for (var i = 0; i < activeKeys.length; i++) {
+    var layerId = activeKeys[i];
+    var color = layerColors[layerId] || "#888";
+    var label = document.querySelector("label[for='cb-" + layerId + "']");
+    var title = label ? label.textContent.trim() : layerId;
+    var cb = document.getElementById("cb-" + layerId);
+    var url = cb ? (cb.getAttribute("data-url") || "#") : "#";
+    var item = document.createElement("div");
+    item.className = "al-item";
+    item.innerHTML = "<div class='al-swatch' style='background:" + color + "'></div><div class='al-info'><div class='al-name'>" + title + "</div><a class='al-link' href='" + url + "' target='_blank'>View dataset</a></div>";
+    items.appendChild(item);
+  }
+  panel.classList.add("show");
 }
 </script>
 </body>

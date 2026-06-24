@@ -203,3 +203,16 @@ MAPSTORE_BASELAYERS = [
         "args": ["Empty Background", {"visibility": False}]
     }
 ]
+
+# Large file upload support
+MAX_UPLOAD_SIZE = 524288000  # 500MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 524288000  # 500MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000  # 500MB
+
+# CSRF and allowed hosts for IP-based access
+CSRF_TRUSTED_ORIGINS = [
+    "http://192.168.2.16",
+    "http://localhost",
+    "http://127.0.0.1",
+]
+ALLOWED_HOSTS = ['*']
