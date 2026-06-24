@@ -101,7 +101,10 @@ html,body{height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",s
 </header>
 <div class="pbar">
   <h1>&#128193; Browse by Theme <span style="color:#6b7d91;font-weight:400;font-size:.75rem">— select layers to display on map</span></h1>
-  <a href="/catalogue/">&#8592; Catalogue</a>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button onclick="printMap()" style="background:#c8a951;color:#0a1420;border:none;border-radius:4px;padding:4px 12px;font-size:.78rem;font-weight:600;cursor:pointer">&#128438; Print Map</button>
+    <a href="/catalogue/">&#8592; Catalogue</a>
+  </div>
 </div>
 <div class="wrap">
   <div class="sb">
@@ -127,7 +130,7 @@ html,body{height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",s
               <div class="lyr-top">
                 <input class="lyr-cb" type="checkbox" id="cb-{{l.id}}"
                   onchange="toggleLayer(this,'{{l.id}}','geonode:{{l.name}}','{{l.title|escapejs}}')"
-                  data-url="/catalogue/#/dataset/{{l.id}}" data-abstract="{{l.abstract|escapejs}}">
+                  data-url="/catalogue/#/dataset/{{l.id}}" data-abstract="{{l.abstract|escapejs}}" data-layer-name="geonode:{{l.name}}">
                 <div class="lyr-swatch" id="sw-{{l.id}}"></div>
                 <label class="lyr-name" for="cb-{{l.id}}">{{l.title}}</label>
                 <button class="lyr-info-btn" onclick="showInfo('{{l.title|escapejs}}','{{l.abstract|escapejs}}','/catalogue/#/dataset/{{l.id}}')">&#9432;</button>
@@ -284,6 +287,91 @@ function updateActivePanel() {
     items.appendChild(item);
   }
   panel.classList.add("show");
+}
+function printMap() {
+  var activeNames = [];
+  Object.keys(activeLayers).forEach(function(id) {
+    var label = document.querySelector("label[for='cb-" + id + "']");
+    if (label) activeNames.push(label.textContent.trim());
+  });
+  var title = activeNames.length ? activeNames.join(", ") : "CCDA GeoPortal Map";
+  var date = new Date().toLocaleDateString("en-GB");
+
+  // Build WMS URL for current map view
+  var bounds = map.getBounds();
+  var sw = bounds.getSouthWest();
+  var ne = bounds.getNorthEast();
+  var bbox = sw.lng + "," + sw.lat + "," + ne.lng + "," + ne.lat;
+  var size = map.getSize();
+  var w = size.x;
+  var h = size.y;
+
+  // Base satellite tile as image
+  var center = map.getCenter();
+  var zoom = map.getZoom();
+
+  // Collect active WMS layers
+  var wmsLayers = Object.keys(activeLayers).map(function(id) {
+    var cb = document.getElementById("cb-" + id);
+    return cb ? cb.getAttribute("data-layer-name") || "" : "";
+  }).filter(Boolean);
+  // Always include provinces
+  wmsLayers.unshift("geonode:gadm41_PNG_1");
+
+  var layerStr = wmsLayers.join(",");
+  var wmsUrl = "http://192.168.2.16/geoserver/ows?service=WMS&version=1.1.1&request=GetMap" +
+    "&layers=" + layerStr +
+    "&bbox=" + bbox +
+    "&width=" + w + "&height=" + h +
+    "&srs=EPSG:4326&format=image/png&transparent=true&styles=png_provinces,";
+
+  // Open print window
+  var pw = window.open("", "_blank");
+  pw.document.write("<!DOCTYPE html><html><head><title>" + title + "</title>");
+  pw.document.write("<style>");
+  pw.document.write("*{margin:0;padding:0;box-sizing:border-box}");
+  pw.document.write("body{font-family:Arial,sans-serif;background:#fff}");
+  pw.document.write(".hdr{background:#0a1420;color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}");
+  pw.document.write(".hdr-left{display:flex;align-items:center;gap:10px}");
+  pw.document.write(".hdr h1{color:#c8a951;font-size:13px;margin:0}");
+  pw.document.write(".hdr .sub{color:#aab8c8;font-size:10px;margin-top:2px}");
+  pw.document.write(".hdr .date{color:#6b7d91;font-size:10px}");
+  pw.document.write(".map-wrap{position:relative;background:#0f1c2e;width:100%}");
+  pw.document.write(".map-wrap img{width:100%;display:block}");
+  pw.document.write(".ftr{padding:8px 16px;display:flex;justify-content:space-between;font-size:9px;color:#666;border-top:1px solid #eee}");
+  pw.document.write(".layers-list{padding:8px 16px;font-size:10px;color:#333;background:#f9f9f9;border-bottom:1px solid #eee}");
+  pw.document.write(".layers-list span{font-weight:bold}");
+  pw.document.write(".print-btn{display:block;text-align:center;padding:10px;background:#f0f0f0}");
+  pw.document.write(".print-btn button{padding:8px 24px;background:#c8a951;color:#0a1420;border:none;border-radius:4px;font-weight:700;cursor:pointer;font-size:13px}");
+  pw.document.write("@media print{.print-btn{display:none}}");
+  pw.document.write("</style></head><body>");
+
+  // Header
+  pw.document.write("<div class='hdr'>");
+  pw.document.write("<div class='hdr-left'><div><h1>CCDA GeoPortal</h1><div class='sub'>" + title + "</div></div></div>");
+  pw.document.write("<div class='date'>" + date + "</div>");
+  pw.document.write("</div>");
+
+  // Active layers list
+  if (activeNames.length) {
+    pw.document.write("<div class='layers-list'><span>Active Layers:</span> " + activeNames.join(" &bull; ") + "</div>");
+  }
+
+  // Map image using WMS GetMap
+  pw.document.write("<div class='map-wrap'>");
+  pw.document.write("<img src='" + wmsUrl + "' alt='Map'>");
+  pw.document.write("</div>");
+
+  // Footer
+  pw.document.write("<div class='ftr'>");
+  pw.document.write("<span>Climate Change and Development Authority (CCDA) &mdash; Papua New Guinea</span>");
+  pw.document.write("<span>Printed: " + date + "</span>");
+  pw.document.write("</div>");
+
+  // Print button
+  pw.document.write("<div class='print-btn'><button onclick='window.print()'>&#128438; Print / Save as PDF</button></div>");
+  pw.document.write("</body></html>");
+  pw.document.close();
 }
 </script>
 </body>
