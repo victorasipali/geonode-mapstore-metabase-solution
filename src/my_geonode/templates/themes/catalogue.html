@@ -3,107 +3,253 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Browse by Theme - CCDA GeoPortal</title>
+<link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f1c2e;color:#d4dce4}
-.gn-header{background:#0a1420;border-bottom:2px solid #c8a951;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
-.gn-header-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
-.gn-header-logo img{height:36px;border-radius:50%}
-.gn-header-logo span{color:#e8edf2;font-weight:600;font-size:1rem}
-.gn-header-nav a{color:#aab8c8;text-decoration:none;font-size:.85rem;padding:6px 10px;border-radius:4px;transition:all .15s;margin-left:4px}
-.gn-header-nav a:hover{color:#e8edf2;background:#1c2d42}
-.gn-header-nav a.active{color:#c8a951}
-.page-header{background:#0a1420;border-bottom:1px solid #1c2d42;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
-.page-header h1{color:#fff;font-size:1.1rem;font-weight:600}
-.page-header p{color:#6b7d91;font-size:.8rem;margin-top:2px}
-.page-header a{color:#c8a951;text-decoration:none;font-size:.82rem}
-.themes-body{display:flex;height:calc(100vh - 108px)}
-.themes-sidebar{width:280px;min-width:280px;background:#0a1420;border-right:1px solid #1c2d42;overflow-y:auto;padding:8px 0}
-.cat-header{display:flex;align-items:center;padding:10px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;user-select:none}
-.cat-header:hover,.cat-header.active{background:#1c2d42;border-left-color:#c8a951}
-.cat-toggle{color:#c8a951;font-size:.7rem;width:14px;transition:transform .2s;display:inline-block}
-.cat-toggle.open{transform:rotate(90deg)}
-.cat-name{color:#e8edf2;font-weight:600;font-size:.88rem;flex:1;margin-left:8px}
-.cat-count{background:#c8a951;color:#0a1420;font-size:.68rem;font-weight:700;padding:1px 5px;border-radius:8px}
-.group-list{display:none;background:#0d1928}
-.group-list.open{display:block}
-.group-item{display:flex;align-items:center;padding:7px 16px 7px 32px;cursor:pointer;border-left:3px solid transparent;transition:all .15s}
-.group-item:hover,.group-item.active{background:#1c2d42;border-left-color:#4f8fc0}
-.group-name{color:#aab8c8;font-size:.83rem;flex:1}
-.group-count{color:#6b7d91;font-size:.72rem;background:#1c2d42;padding:1px 5px;border-radius:6px}
-.group-count.has-layers{color:#c8a951;background:rgba(200,169,81,.15)}
-.themes-content{flex:1;overflow-y:auto;padding:24px}
-.content-header{margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid #1c2d42}
-.content-header h2{color:#e8edf2;font-size:1.05rem;font-weight:600;margin-bottom:3px}
-.content-header p{color:#6b7d91;font-size:.8rem}
-.layer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
-.layer-card{background:#0a1420;border:1px solid #1c2d42;border-radius:8px;overflow:hidden;transition:all .2s;text-decoration:none;display:block}
-.layer-card:hover{border-color:#c8a951;transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.4)}
-.layer-thumb{width:100%;height:120px;object-fit:cover;display:block}
-.layer-thumb-ph{width:100%;height:120px;background:linear-gradient(135deg,#1c2d42,#0f1c2e);display:flex;align-items:center;justify-content:center;color:#2a3848;font-size:2rem}
-.layer-info{padding:10px}
-.layer-title{color:#d4dce4;font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.layer-type{color:#6b7d91;font-size:.72rem;background:#1c2d42;padding:1px 5px;border-radius:3px;text-transform:uppercase;margin-top:4px;display:inline-block}
-.empty-state{text-align:center;padding:60px 20px;color:#4a5868}
-.empty-state .icon{font-size:2.5rem;margin-bottom:10px}
-.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:70%;text-align:center;color:#4a5868}
-.welcome h3{color:#6b7d91;font-size:1rem;margin-bottom:6px}
+html,body{height:100vh;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0f1c2e;color:#d4dce4}
+/* Header */
+.hdr{background:#0a1420;border-bottom:2px solid #c8a951;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
+.hdr-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.hdr-logo img{height:30px;border-radius:50%}
+.hdr-logo span{color:#e8edf2;font-weight:600;font-size:.9rem}
+.hdr-nav a{color:#aab8c8;text-decoration:none;font-size:.82rem;padding:5px 9px;border-radius:4px;margin-left:3px}
+.hdr-nav a:hover,.hdr-nav a.active{color:#c8a951}
+/* Page bar */
+.pbar{background:#0a1420;border-bottom:1px solid #1c2d42;height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
+.pbar h1{color:#e8edf2;font-size:.88rem;font-weight:600}
+.pbar a{color:#c8a951;text-decoration:none;font-size:.75rem}
+/* Layout */
+.wrap{display:flex;height:calc(100vh - 84px)}
+/* Sidebar */
+.sb{width:270px;min-width:270px;background:#0b1825;border-right:1px solid #1c2d42;overflow-y:auto;flex-shrink:0}
+.sb-title{padding:8px 12px;color:#6b7d91;font-size:.7rem;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid #1c2d42}
+/* Category row */
+.cat-row{display:flex;align-items:center;padding:7px 10px;cursor:pointer;border-left:3px solid transparent;user-select:none}
+.cat-row:hover{background:#1c2d42;border-left-color:#c8a951}
+.cat-row.open{background:#0f1e2e;border-left-color:#c8a951}
+.cat-arrow{color:#c8a951;font-size:.6rem;width:12px;transition:transform .2s;flex-shrink:0}
+.cat-arrow.open{transform:rotate(90deg)}
+.cat-label{color:#e8edf2;font-weight:600;font-size:.82rem;flex:1;margin-left:6px}
+.cat-cnt{background:#c8a951;color:#0a1420;font-size:.62rem;font-weight:700;padding:1px 5px;border-radius:6px}
+/* Group row */
+.grp-rows{display:none;background:#0d1a28}
+.grp-rows.open{display:block}
+.grp-row{display:flex;align-items:center;padding:5px 10px 5px 22px;cursor:pointer;border-left:3px solid transparent;user-select:none}
+.grp-row:hover{background:#1c2d42;border-left-color:#4f8fc0}
+.grp-row.open{background:#0f1e2e;border-left-color:#4f8fc0}
+.grp-arrow{color:#6b7d91;font-size:.6rem;width:12px;transition:transform .2s;flex-shrink:0}
+.grp-arrow.open{transform:rotate(90deg)}
+.grp-label{color:#aab8c8;font-size:.78rem;flex:1;margin-left:5px}
+.grp-cnt{font-size:.62rem;padding:1px 4px;border-radius:4px;background:#1c2d42;color:#6b7d91}
+.grp-cnt.has{color:#c8a951;background:rgba(200,169,81,.2)}
+/* Layer rows */
+.lyr-rows{display:none;background:#0a1520}
+.lyr-rows.open{display:block}
+.lyr-row{padding:5px 10px 5px 32px;border-left:3px solid transparent;border-bottom:1px solid rgba(28,45,66,.5)}
+.lyr-row:hover{background:#1c2d42}
+/* Layer top line: checkbox + legend swatch + name */
+.lyr-top{display:flex;align-items:center;gap:6px}
+.lyr-cb{accent-color:#c8a951;width:13px;height:13px;cursor:pointer;flex-shrink:0}
+.lyr-swatch{width:16px;height:16px;border-radius:2px;border:1px solid #2a3848;flex-shrink:0;background:#888}
+.lyr-name{color:#d4dce4;font-size:.76rem;flex:1;cursor:pointer}
+.lyr-name:hover{color:#c8a951}
+/* Legend expand */
+.lyr-legend{margin-top:4px;padding-left:20px;display:none}
+.lyr-legend.show{display:block}
+.lyr-legend img{max-width:180px;border:1px solid #1c2d42;border-radius:3px}
+.lyr-legend-label{color:#6b7d91;font-size:.68rem;margin-top:2px}
+/* Opacity slider */
+.lyr-opacity{margin-top:4px;padding-left:20px;display:none;align-items:center;gap:6px}
+.lyr-opacity.show{display:flex}
+.lyr-opacity input[type=range]{flex:1;accent-color:#c8a951;height:3px}
+.lyr-opacity span{color:#6b7d91;font-size:.65rem;width:28px;text-align:right}
+/* Map */
+.mp{flex:1;position:relative}
+#map{position:absolute;inset:0}
+/* Map overlay info */
+.map-tip{position:absolute;bottom:30px;left:10px;z-index:1000;background:rgba(10,20,32,.85);border:1px solid #1c2d42;border-radius:5px;padding:6px 10px;font-size:.72rem;color:#aab8c8;pointer-events:none;display:none}
+.map-tip.show{display:block}
+/* Leaflet */
+.leaflet-control-attribution{background:rgba(10,20,32,.7)!important;color:#6b7d91!important;font-size:.6rem!important}
+.leaflet-control-attribution a{color:#c8a951!important}
+.leaflet-bar a{background:#0a1420!important;color:#e8edf2!important;border-color:#1c2d42!important}
 </style>
 </head>
 <body>
-<header class="gn-header">
-  <a href="/" class="gn-header-logo">
+<header class="hdr">
+  <a href="/" class="hdr-logo">
     <img src="{% static 'img/navbar-logo.png' %}" alt="CCDA">
     <span>CCDA GeoPortal</span>
   </a>
-  <nav class="gn-header-nav">
+  <nav class="hdr-nav">
     <a href="/catalogue/">Catalogue</a>
     <a href="/themes/" class="active">Browse Themes</a>
     <a href="/analytics/">Analytics</a>
     <a href="/groups/">Groups</a>
   </nav>
 </header>
-<div class="page-header">
-  <div>
-    <h1>&#128193; Browse by Theme</h1>
-    <p>Explore datasets organised by thematic category</p>
-  </div>
-  <a href="/catalogue/">&#8592; Back to Catalogue</a>
+<div class="pbar">
+  <h1>&#128193; Browse by Theme &nbsp;<span style="color:#6b7d91;font-weight:400;font-size:.75rem">— select layers to display on map</span></h1>
+  <a href="/catalogue/">&#8592; Catalogue</a>
 </div>
-<div class="themes-body">
-  <div class="themes-sidebar">
+<div class="wrap">
+  <div class="sb">
+    <div class="sb-title">Layers</div>
     {% for cat_data in categories %}
     <div>
-      <div class="cat-header" onclick="toggleCat(this,'{{ cat_data.category.slug }}')">
-        <span class="cat-toggle">&#9658;</span>
-        <span class="cat-name">{{ cat_data.category.name }}</span>
-        {% if cat_data.total_layers %}<span class="cat-count">{{ cat_data.total_layers }}</span>{% endif %}
+      <div class="cat-row" onclick="toggleCat(this,'c{{cat_data.category.slug|cut:"-"}}')">
+        <span class="cat-arrow">&#9658;</span>
+        <span class="cat-label">{{ cat_data.category.name }}</span>
+        {% if cat_data.total_layers %}<span class="cat-cnt">{{ cat_data.total_layers }}</span>{% endif %}
       </div>
-      <div class="group-list" id="cat-{{ cat_data.category.slug }}">
+      <div class="grp-rows" id="c{{cat_data.category.slug|cut:"-"}}">
         {% for gd in cat_data.groups %}
-        <div class="group-item" onclick="showGroup('{{ gd.profile.slug }}',this)">
-          <span class="group-name">{{ gd.profile.title }}</span>
-          <span class="group-count {% if gd.layer_count %}has-layers{% endif %}">{{ gd.layer_count }}</span>
+        <div>
+          <div class="grp-row" onclick="toggleGrp(this,'g{{gd.profile.slug|cut:"-"}}')">
+            <span class="grp-arrow">&#9658;</span>
+            <span class="grp-label">{{ gd.profile.title }}</span>
+            <span class="grp-cnt {% if gd.layer_count %}has{% endif %}">{{ gd.layer_count }}</span>
+          </div>
+          <div class="lyr-rows" id="g{{gd.profile.slug|cut:"-"}}">
+            {% for l in gd.layers %}
+            <div class="lyr-row" id="row-{{l.id}}">
+              <div class="lyr-top">
+                <input class="lyr-cb" type="checkbox" id="cb-{{l.id}}"
+                  onchange="toggleLayer(this,'{{l.id}}','geonode:{{l.name}}','{{l.title|escapejs}}')"
+                  data-layer-id="{{l.id}}" data-layer-name="geonode:{{l.name}}">
+                <div class="lyr-swatch" id="sw-{{l.id}}"></div>
+                <label class="lyr-name" for="cb-{{l.id}}" title="{{l.title}}">{{l.title}}</label>
+              </div>
+              <div class="lyr-legend" id="leg-{{l.id}}">
+                <img src="" id="legimg-{{l.id}}" alt="legend">
+                <div class="lyr-legend-label" id="legtxt-{{l.id}}"></div>
+              </div>
+              <div class="lyr-opacity" id="opc-{{l.id}}">
+                <input type="range" min="0" max="100" value="85"
+                  oninput="setOpacity('{{l.id}}',this.value/100);document.getElementById('opcval-{{l.id}}').textContent=this.value+'%'">
+                <span id="opcval-{{l.id}}">85%</span>
+              </div>
+            </div>
+            {% empty %}
+            <div style="padding:6px 10px 6px 32px;color:#4a5868;font-size:.72rem;font-style:italic">No datasets yet</div>
+            {% endfor %}
+          </div>
         </div>
         {% endfor %}
       </div>
     </div>
     {% endfor %}
   </div>
-  <div class="themes-content" id="themesContent">
-    <div class="welcome">
-      <h3>Select a theme group</h3>
-      <p>Choose a category from the sidebar to browse datasets</p>
-    </div>
+  <div class="mp">
+    <div id="map"></div>
+    <div class="map-tip" id="mapTip"></div>
   </div>
 </div>
-<script id="theme-data" type="application/json">{{ theme_data_json }}</script>
+
 <script>
-const D=JSON.parse(document.getElementById("theme-data").textContent);
-function toggleCat(h,s){const g=document.getElementById('cat-'+s),t=h.querySelector('.cat-toggle'),o=g.classList.contains('open');g.classList.toggle('open',!o);t.classList.toggle('open',!o);h.classList.toggle('active',!o)}
-function showGroup(slug,el){document.querySelectorAll('.group-item').forEach(i=>i.classList.remove('active'));el.classList.add('active');const d=D[slug],c=document.getElementById('themesContent');if(!d)return;let h=`<div class="content-header"><h2>${d.title}</h2><p>${d.cat} &middot; ${d.count} dataset${d.count!==1?'s':''}</p></div>`;if(!d.layers.length){h+='<div class="empty-state"><div class="icon">&#128194;</div><p>No datasets in this group yet.</p></div>';}else{h+='<div class="layer-grid">';d.layers.forEach(l=>{const th=l.thumb?`<img class="layer-thumb" src="${l.thumb}" alt="${l.title}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` :'';const ph=`<div class="layer-thumb-ph" ${l.thumb?'style="display:none"':''}>&#128506;</div>`;h+=`<a class="layer-card" href="${l.url}" target="_blank">${th}${ph}<div class="layer-info"><div class="layer-title">${l.title}</div><span class="layer-type">${l.subtype}</span></div></a>`;});h+='</div>';}c.innerHTML=h}
+const GS = "http://192.168.2.16/geoserver/ows";
+const activeLayers = {};
+const layerColors = {};
+const COLORS = ["#FFD700","#00FF88","#FF6B6B","#4FC3F7","#FF8A65","#CE93D8","#80CBC4","#FFCC02","#69F0AE","#FF4081"];
+let colorIdx = 0;
+
+// Init map
+document.getElementById("map").style.height = (window.innerHeight - 84) + "px";
+window.addEventListener("resize", () => {
+  document.getElementById("map").style.height = (window.innerHeight - 84) + "px";
+  map.invalidateSize();
+});
+
+const map = L.map("map", {center:[-6.5,147],zoom:6,zoomControl:false});
+L.control.zoom({position:"bottomright"}).addTo(map);
+
+// Satellite basemap
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  {attribution:"Tiles &copy; Esri",maxZoom:18}).addTo(map);
+
+// Province boundaries always on
+L.tileLayer.wms(GS, {
+  layers:"geonode:gadm41_PNG_1", styles:"png_provinces",
+  format:"image/png", transparent:true, version:"1.1.1", opacity:1
+}).addTo(map);
+
+function toggleCat(el, id) {
+  const rows = document.getElementById(id);
+  const arrow = el.querySelector(".cat-arrow");
+  const open = rows.classList.toggle("open");
+  arrow.classList.toggle("open", open);
+  el.classList.toggle("open", open);
+}
+
+function toggleGrp(el, id) {
+  const rows = document.getElementById(id);
+  const arrow = el.querySelector(".grp-arrow");
+  const open = rows.classList.toggle("open");
+  arrow.classList.toggle("open", open);
+  el.classList.toggle("open", open);
+}
+
+function toggleLayer(cb, layerId, layerName, layerTitle) {
+  if (cb.checked) {
+    const color = COLORS[colorIdx % COLORS.length];
+    colorIdx++;
+    layerColors[layerId] = color;
+
+    // Color swatch
+    document.getElementById("sw-" + layerId).style.background = color;
+
+    // Add WMS layer
+    // Get the style name from data attribute
+    const styleMap = {
+      "geonode:biodiversity_priority_areas": "biodiversity_areas",
+      "geonode:gadm41_PNG_0": "png_national",
+      "geonode:gadm41_PNG_1": "png_provinces",
+      "geonode:gadm41_PNG_2": "png_provinces"
+    };
+    const styleName = styleMap[layerName] || "";
+    const wmsLayer = L.tileLayer.wms(GS, {
+      layers: layerName, styles: styleName,
+      format:"image/png", transparent:true,
+      version:"1.1.1", opacity:0.85
+    });
+    wmsLayer.addTo(map);
+    activeLayers[layerId] = wmsLayer;
+
+    // Show legend image from GeoServer
+    const legImg = document.getElementById("legimg-" + layerId);
+    legImg.src = `${GS}?service=WMS&version=1.1.1&request=GetLegendGraphic&layer=${layerName}&format=image/png&width=120&height=20&legend_options=fontName:Arial;fontSize:9;fontColor:0xffffff;bgColor:0x0a1420;dpi:90`;
+    legImg.onerror = function() { this.style.display="none"; };
+    document.getElementById("legtxt-" + layerId).textContent = layerTitle;
+    document.getElementById("leg-" + layerId).classList.add("show");
+    document.getElementById("opc-" + layerId).classList.add("show");
+
+    // Map tip
+    const tip = document.getElementById("mapTip");
+    tip.textContent = "Loaded: " + layerTitle;
+    tip.classList.add("show");
+    setTimeout(() => tip.classList.remove("show"), 3000);
+
+  } else {
+    // Remove layer
+    if (activeLayers[layerId]) {
+      map.removeLayer(activeLayers[layerId]);
+      delete activeLayers[layerId];
+    }
+    document.getElementById("sw-" + layerId).style.background = "#888";
+    document.getElementById("leg-" + layerId).classList.remove("show");
+    document.getElementById("opc-" + layerId).classList.remove("show");
+  }
+}
+
+function setOpacity(layerId, val) {
+  if (activeLayers[layerId]) activeLayers[layerId].setOpacity(val);
+}
 </script>
 </body>
 </html>

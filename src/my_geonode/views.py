@@ -15,7 +15,7 @@ def analytics_dashboard(request):
 
 def themes_catalogue(request):
     from geonode.groups.models import GroupCategory
-    from geonode.base.models import ResourceBase
+    from geonode.layers.models import Dataset
 
     categories = []
     theme_data = {}
@@ -23,13 +23,14 @@ def themes_catalogue(request):
     for cat in GroupCategory.objects.all().order_by('name'):
         groups_data = []
         for g in cat.groups.all().order_by('title'):
-            layers = ResourceBase.objects.filter(
-                group=g.group, resource_type='dataset'
+            layers = Dataset.objects.filter(
+                group=g.group
             ).order_by('title')
             layer_list = [
                 {
                     'id': l.id,
-                    'title': l.title,
+                    'name': l.name or '',
+                    'title': l.title or '',
                     'subtype': l.subtype or 'dataset',
                     'thumb': l.thumbnail_url or '',
                     'url': f'/catalogue/#/dataset/{l.id}'
