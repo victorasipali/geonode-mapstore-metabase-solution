@@ -59,3 +59,81 @@ def themes_catalogue(request):
         'theme_data_json': json.dumps(theme_data),
         'page_title': 'Browse by Theme',
     })
+
+
+def feedback_view(request):
+    from .feedback import Feedback
+    from django.core.mail import send_mail
+    from django.conf import settings
+
+    success = False
+    error = None
+
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip() or 'Anonymous'
+        email = request.POST.get('email', '').strip()
+        category = request.POST.get('category', 'general')
+        message = request.POST.get('message', '').strip()
+
+        if not message:
+            error = 'Please enter a message.'
+        else:
+            # Get IP
+            x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+            ip = x_forwarded.split(',')[0] if x_forwarded else request.META.get('REMOTE_ADDR')
+
+            # Save to database
+            fb = Feedback.objects.create(
+                name=name,
+                email=email,
+                category=category,
+                message=message,
+                ip_address=ip,
+            )
+
+            # Send email notification
+            category_labels = {
+                'data_request': 'Data Request',
+                'general': 'General Feedback',
+                'map_issue': 'Map Issue',
+                'bug_report': 'Bug Report',
+            }
+            cat_label = category_labels.get(category, category)
+
+            subject = f'[CCDA GeoPortal Feedback] {cat_label} from {name}'
+            body = f"""
+New feedback received on CCDA GeoPortal
+========================================
+
+Category:   {cat_label}
+Name:       {name}
+Email:      {email or 'Not provided'}
+Submitted:  {fb.submitted_at.strftime('%Y-%m-%d %H:%M UTC')}
+IP Address: {ip}
+
+Message:
+--------
+{message}
+
+========================================
+View all feedback: http://192.168.2.16/admin/my_geonode/feedback/
+            """
+
+            try:
+                send_mail(
+                    subject=subject,
+                    message=body,
+                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@ccda.gov.pg'),
+                    recipient_list=['victor.asipali@ccda.gov.pg'],
+                    fail_silently=True,
+                )
+            except Exception as e:
+                pass  # Email failure shouldn't block form submission
+
+            success = True
+
+    return render(request, 'feedback/feedback.html', {
+        'success': success,
+        'error': error,
+        'page_title': 'Feedback',
+    })
