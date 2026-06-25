@@ -50,7 +50,7 @@ class FeedbackAdmin(admin.ModelAdmin):
     list_display = ['name', 'email', 'category', 'status', 'submitted_at', 'resolved_by']
     list_filter = ['category', 'status', 'submitted_at']
     search_fields = ['name', 'email', 'message', 'admin_notes']
-    readonly_fields = ['submitted_at', 'ip_address', 'resolved_at']
+    readonly_fields = ['submitted_at', 'ip_address', 'resolved_at', 'category', 'name', 'email', 'message']
     ordering = ['-submitted_at']
     list_per_page = 25
     actions = [mark_reviewed, mark_resolved]
