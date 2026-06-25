@@ -130,6 +130,47 @@ View all feedback: http://192.168.2.16/admin/my_geonode/feedback/
             except Exception as e:
                 pass  # Email failure shouldn't block form submission
 
+            # Slack notification
+            try:
+                import requests as req
+                slack_webhook = os.environ.get('SLACK_WEBHOOK_URL', '')
+                if not slack_webhook: raise ValueError('No Slack webhook configured')
+                slack_msg = {
+                    "blocks": [
+                        {
+                            "type": "header",
+                            "text": {"type": "plain_text", "text": f"New {cat_label} - CCDA GeoPortal"}
+                        },
+                        {
+                            "type": "section",
+                            "fields": [
+                                {"type": "mrkdwn", "text": f"*Name:*\n{name}"},
+                                {"type": "mrkdwn", "text": f"*Category:*\n{cat_label}"},
+                                {"type": "mrkdwn", "text": f"*Email:*\n{email or 'Not provided'}"},
+                                {"type": "mrkdwn", "text": f"*Submitted:*\n{fb.submitted_at.strftime('%Y-%m-%d %H:%M UTC')}"}
+                            ]
+                        },
+                        {
+                            "type": "section",
+                            "text": {"type": "mrkdwn", "text": f"*Message:*\n{message}"}
+                        },
+                        {
+                            "type": "actions",
+                            "elements": [
+                                {
+                                    "type": "button",
+                                    "text": {"type": "plain_text", "text": "View in Admin"},
+                                    "url": "http://192.168.2.16/admin/my_geonode/feedback/",
+                                    "style": "primary"
+                                }
+                            ]
+                        }
+                    ]
+                }
+                req.post(slack_webhook, json=slack_msg, timeout=5)
+            except Exception:
+                pass  # Slack failure shouldn't block form submission
+
             success = True
 
     return render(request, 'feedback/feedback.html', {
