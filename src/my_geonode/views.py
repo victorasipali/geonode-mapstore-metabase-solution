@@ -125,7 +125,7 @@ View all feedback: http://192.168.2.16/admin/my_geonode/feedback/
                     subject=subject,
                     message=body,
                     from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@ccda.gov.pg'),
-                    recipient_list=['victor.asipali@ccda.gov.pg'],
+                    recipient_list=[r.strip() for r in os.environ.get('FEEDBACK_RECIPIENTS', 'victor.asipali@ccda.gov.pg').split(',')],
                     fail_silently=True,
                 )
             except Exception as e:
