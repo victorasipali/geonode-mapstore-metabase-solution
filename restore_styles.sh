@@ -9,10 +9,20 @@ SLD_DIR="/opt/geonode-project/my_geonode/src/my_geonode/static/sld"
 for sld in $SLD_DIR/*.sld; do
   name=$(basename "${sld%.sld}")
   echo "Uploading: $name"
-  curl -s -u $AUTH \
+  # Try POST first, if fails use PUT (style exists)
+  result=$(curl -s -o /dev/null -w "%{http_code}" -u $AUTH \
     -X POST -H "Content-Type: application/vnd.ogc.sld+xml" \
     -d @"$sld" \
-    "$GS/styles?name=$name" 2>/dev/null
+    "$GS/styles?name=$name")
+  if [ "$result" = "403" ]; then
+    curl -s -u $AUTH \
+      -X PUT -H "Content-Type: application/vnd.ogc.sld+xml" \
+      -d @"$sld" \
+      "$GS/styles/$name"
+    echo "  Updated: $name"
+  else
+    echo "  Created: $name ($result)"
+  fi
 done
 
 # Apply province style to province layer
