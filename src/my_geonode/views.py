@@ -31,6 +31,7 @@ def themes_catalogue(request):
                 {
                     'id': l.id,
                     'name': l.name or '',
+                    'typename': l.typename or f'geonode:{l.name}' if l.name else '',
                     'title': l.title or '',
                     'subtype': l.subtype or 'dataset',
                     'thumb': l.thumbnail_url or '',
