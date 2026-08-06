@@ -80,6 +80,12 @@ html,body{height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",s
 .al-link:hover{text-decoration:underline}
 /* Footer */
 .ftr{background:#0a1420;border-top:1px solid #1c2d42;padding:6px 20px;display:flex;align-items:center;justify-content:space-between;font-size:.72rem;flex-shrink:0}
+
+/* Legend */
+.lyr-legend{display:none;padding:4px 4px 4px 32px;background:#09131e}
+.lyr-legend.show{display:block}
+.lyr-legend img{max-width:100%;display:block;margin-top:2px;filter:brightness(0.95)}
+.lyr-legend-error{color:#4a5868;font-size:.65rem;padding:2px 0;font-style:italic}
 /* Leaflet */
 .leaflet-control-attribution{background:rgba(10,20,32,.7)!important;color:#6b7d91!important;font-size:.6rem!important}
 .leaflet-control-attribution a{color:#c8a951!important}
@@ -139,6 +145,10 @@ html,body{height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",s
                 <input type="range" min="0" max="100" value="85"
                   oninput="setOpacity('{{l.id}}',this.value/100);document.getElementById('opcval-{{l.id}}').textContent=this.value+'%'">
                 <span id="opcval-{{l.id}}">85%</span>
+              </div>
+              <div class="lyr-legend" id="leg-{{l.id}}">
+                <img src="http://192.168.2.16/geoserver/ows?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=geonode:{{l.name}}&LEGEND_OPTIONS=forceLabels:on;fontSize:11;fontAntiAliasing:true;fontColor:0xd4dce4;bgColor:0x09131e;dpi:96&transparent=true&width=16&height=16"
+                     alt="legend" onerror="this.parentNode.innerHTML='<span class=lyr-legend-error>Legend unavailable</span>'">
               </div>
             </div>
             {% empty %}
@@ -239,6 +249,7 @@ function toggleLayer(cb, layerId, layerName, layerTitle) {
     wmsLayer.addTo(map);
     activeLayers[layerId] = wmsLayer;
     document.getElementById("opc-" + layerId).classList.add("show");
+    document.getElementById("leg-" + layerId).classList.add("show");
     // Auto-show info panel for this layer
     var cbEl = document.getElementById("cb-" + layerId);
     var lbl = document.querySelector("label[for='cb-" + layerId + "']");
@@ -251,6 +262,7 @@ function toggleLayer(cb, layerId, layerName, layerTitle) {
     delete layerColors[layerId];
     document.getElementById("sw-" + layerId).style.background = "#888";
     document.getElementById("opc-" + layerId).classList.remove("show");
+    document.getElementById("leg-" + layerId).classList.remove("show");
   }
   updateActivePanel();
 }
