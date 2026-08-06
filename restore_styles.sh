@@ -60,3 +60,23 @@ if added > 0:
     invalidate_geofence_cache()
 print(f'GeoFence: {added} rules restored')
 " 2>/dev/null
+
+# Restore Metabase nginx proxy config
+echo "Restoring Metabase nginx config..."
+docker exec nginx4my_geonode sh -c 'cat > /etc/nginx/sites-enabled/metabase.conf << "NGINXEOF"
+location /metabase/ {
+    proxy_pass http://metabase4my_geonode:3000/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 300;
+    client_max_body_size 100M;
+}
+
+location = /metabase {
+    return 302 /metabase/;
+}
+NGINXEOF'
+docker exec nginx4my_geonode nginx -s reload
+echo "Metabase nginx config restored!"

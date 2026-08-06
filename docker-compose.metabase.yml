@@ -8,8 +8,10 @@ services:
       - "3000:3000"
     environment:
       MB_EMBEDDING_SECRET_KEY: ${METABASE_SECRET_KEY}
-      MB_SITE_URL: http://192.168.2.119/metabase
+      MB_SITE_URL: http://192.168.2.16/metabase
       JAVA_TOOL_OPTIONS: "-Xmx768m -Xms256m"
+      MB_DB_TYPE: h2
+      MB_DB_FILE: /metabase-data/metabase.db
     volumes:
       - metabase_data:/metabase-data
     networks:
@@ -22,3 +24,4 @@ volumes:
 networks:
   my_geonode_default:
     external: true
+# already has metabase_data volume
