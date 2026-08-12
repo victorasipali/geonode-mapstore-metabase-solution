@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 from .metabase import get_metabase_embed_url
 
 
-@login_required
 def analytics_dashboard(request):
     metabase_url = get_metabase_embed_url(dashboard_id=2, bordered=False, titled=False)
     return render(request, 'metabase/dashboard.html', {

@@ -1,49 +1,73 @@
-{% extends "geonode-mapstore-client/catalogue.html" %}
 {% load static %}
-
-{% block head %}
-{{ block.super }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Analytics - CCDA GeoPortal</title>
+<link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
 <style>
-    .metabase-container {
-        padding: 20px;
-        background: #f4f7fa;
-        min-height: calc(100vh - 70px);
-    }
-    .metabase-header {
-        margin-bottom: 16px;
-    }
-    .metabase-header h2 {
-        font-size: 1.5rem;
-        color: #1a2733;
-        font-weight: 600;
-        margin: 0 0 4px 0;
-    }
-    .metabase-header p {
-        color: #5b6b78;
-        margin: 0;
-        font-size: 0.9rem;
-    }
-    .metabase-frame {
-        width: 100%;
-        height: 80vh;
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        background: #ffffff;
-    }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0f1c2e;color:#d4dce4;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.hdr{background:#0a1420;border-bottom:2px solid #c8a951;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0}
+.hdr-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.hdr-logo img{height:30px;border-radius:50%}
+.hdr-logo span{color:#e8edf2;font-weight:600;font-size:.9rem}
+.hdr-nav a{color:#aab8c8;text-decoration:none;font-size:.82rem;padding:5px 9px;border-radius:4px;margin-left:3px}
+.hdr-nav a:hover,.hdr-nav a.active{color:#c8a951}
+.pbar{background:#0a1420;border-bottom:1px solid #1c2d42;height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0}
+.pbar h1{color:#e8edf2;font-size:.88rem;font-weight:600}
+.pbar a{color:#c8a951;text-decoration:none;font-size:.75rem}
+.frame-wrap{flex:1;display:flex;flex-direction:column;min-height:0}
+{% if metabase_url %}
+iframe{flex:1;border:none;width:100%;background:#0f1c2e}
+{% else %}
+.no-embed{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.no-embed h2{color:#c8a951;font-size:1.1rem}
+.no-embed p{color:#6b7d91;font-size:.85rem;text-align:center;max-width:400px}
+.open-btn{background:#c8a951;color:#0a1420;border:none;border-radius:5px;padding:10px 24px;font-size:.88rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}
+.open-btn:hover{background:#d4b86a}
+{% endif %}
+.ftr{background:#0a1420;border-top:1px solid #1c2d42;padding:6px 24px;display:flex;align-items:center;justify-content:space-between;font-size:.72rem;flex-shrink:0}
+.ftr a{color:#6b7d91;text-decoration:none;margin-right:16px}
 </style>
-{% endblock %}
-
-{% block body %}
-<div class="metabase-container">
-    <div class="metabase-header">
-        <h2>GeoNode Analytics Dashboard</h2>
-        <p>Layer inventory and resource statistics powered by Metabase</p>
-    </div>
-    <iframe
-        class="metabase-frame"
-        src="{{ metabase_url }}"
-        allowtransparency>
-    </iframe>
+</head>
+<body>
+<header class="hdr">
+  <a href="/" class="hdr-logo">
+    <img src="{% static 'img/navbar-logo.png' %}" alt="CCDA">
+    <span>CCDA GeoPortal</span>
+  </a>
+  <nav class="hdr-nav">
+    <a href="/catalogue/">Catalogue</a>
+    <a href="/themes/">Browse Themes</a>
+    <a href="/analytics/" class="active">Analytics</a>
+    <a href="/feedback/">Feedback</a>
+  </nav>
+</header>
+<div class="pbar">
+  <h1>📊 GeoPortal Analytics — Layer inventory and resource statistics</h1>
+  <a href="/metabase/dashboard/2" target="_blank">Open in Metabase ↗</a>
 </div>
-{% endblock %}
+<div class="frame-wrap">
+{% if metabase_url %}
+  <iframe src="{{ metabase_url }}" allowtransparency></iframe>
+{% else %}
+  <div class="no-embed">
+    <h2>📊 CCDA Analytics Dashboard</h2>
+    <p>View layer inventory, dataset statistics, and resource breakdowns powered by Metabase.</p>
+    <a href="/metabase/dashboard/2" target="_blank" class="open-btn">Open Analytics Dashboard</a>
+    <p style="margin-top:8px;font-size:.75rem">Opens in Metabase — log in with your CCDA credentials</p>
+  </div>
+{% endif %}
+</div>
+<footer class="ftr">
+  <div>
+    <a href="/catalogue/">Catalogue</a>
+    <a href="/themes/">Browse Themes</a>
+    <a href="/about/">About</a>
+  </div>
+  <div style="color:#4a5868">&copy; 2026 CCDA GeoPortal</div>
+</footer>
+</body>
+</html>

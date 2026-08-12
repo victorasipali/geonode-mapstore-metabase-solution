@@ -6,37 +6,64 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Feedback - CCDA GeoPortal</title>
 <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0f1c2e;color:#d4dce4;min-height:100vh;display:flex;flex-direction:column}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0f1c2e;color:#d4dce4;height:100vh;display:flex;flex-direction:column;overflow:hidden}
 .hdr{background:#0a1420;border-bottom:2px solid #c8a951;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0}
 .hdr-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
 .hdr-logo img{height:30px;border-radius:50%}
 .hdr-logo span{color:#e8edf2;font-weight:600;font-size:.9rem}
 .hdr-nav a{color:#aab8c8;text-decoration:none;font-size:.82rem;padding:5px 9px;border-radius:4px;margin-left:3px}
 .hdr-nav a:hover,.hdr-nav a.active{color:#c8a951}
-.main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}
-.card{background:#0a1420;border:1px solid #1c2d42;border-radius:10px;padding:36px;width:100%;max-width:560px}
-.card-title{color:#e8edf2;font-size:1.2rem;font-weight:600;margin-bottom:4px}
-.card-sub{color:#6b7d91;font-size:.82rem;margin-bottom:28px}
-.form-group{margin-bottom:18px}
-.form-group label{display:block;color:#aab8c8;font-size:.8rem;font-weight:500;margin-bottom:6px}
-.form-group input,.form-group select,.form-group textarea{width:100%;background:#0f1c2e;border:1px solid #1c2d42;border-radius:5px;padding:9px 12px;color:#e8edf2;font-size:.85rem;font-family:inherit;transition:border-color .15s;outline:none}
-.form-group input:focus,.form-group select,.form-group textarea:focus{border-color:#c8a951}
+.wrap{display:flex;flex:1;min-height:0}
+/* Map */
+#map{flex:1;position:relative}
+/* Feedback panel */
+.fb-panel{width:320px;min-width:320px;background:#0b1825;border-left:1px solid #1c2d42;display:flex;flex-direction:column;overflow-y:auto}
+.fb-title{background:#0a1420;border-bottom:1px solid #1c2d42;padding:12px 16px}
+.fb-title h2{color:#c8a951;font-size:.88rem;font-weight:600;margin-bottom:2px}
+.fb-title p{color:#6b7d91;font-size:.72rem}
+/* Draw toolbar */
+.draw-bar{padding:10px 16px;border-bottom:1px solid #1c2d42;background:#0a1420}
+.draw-bar label{color:#aab8c8;font-size:.72rem;text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:6px}
+.draw-btns{display:flex;gap:6px}
+.draw-btn{flex:1;background:#1c2d42;color:#aab8c8;border:1px solid #2a3848;border-radius:4px;padding:6px 8px;font-size:.75rem;cursor:pointer;text-align:center;transition:all .15s}
+.draw-btn:hover,.draw-btn.active{background:#c8a951;color:#0a1420;border-color:#c8a951;font-weight:600}
+.draw-btn.clear{background:rgba(255,80,80,.1);color:#ff8080;border-color:rgba(255,80,80,.3)}
+.draw-btn.clear:hover{background:rgba(255,80,80,.2)}
+.draw-hint{color:#4a5868;font-size:.68rem;margin-top:5px;font-style:italic}
+/* Form */
+.fb-form{padding:14px 16px;flex:1}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;color:#aab8c8;font-size:.75rem;font-weight:500;margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:#0f1c2e;border:1px solid #1c2d42;border-radius:4px;padding:7px 10px;color:#e8edf2;font-size:.82rem;font-family:inherit;outline:none}
+.form-group input:focus,.form-group textarea:focus{border-color:#c8a951}
 .form-group select{cursor:pointer}
 .form-group select option{background:#0f1c2e}
-.form-group textarea{resize:vertical;min-height:120px}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.btn-submit{width:100%;background:#c8a951;color:#0a1420;border:none;border-radius:5px;padding:11px;font-size:.9rem;font-weight:700;cursor:pointer;margin-top:6px;transition:background .15s}
-.btn-submit:hover{background:#d4b86a}
-.success-box{background:rgba(0,200,100,.1);border:1px solid rgba(0,200,100,.3);border-radius:8px;padding:20px;text-align:center}
+.form-group textarea{resize:vertical;min-height:90px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-row{display:flex;gap:8px;margin-top:4px}
+.btn{flex:1;border:none;border-radius:4px;padding:8px;font-size:.8rem;font-weight:600;cursor:pointer}
+.btn-send{background:#c8a951;color:#0a1420}
+.btn-send:hover{background:#d4b86a}
+.btn-cancel{background:#1c2d42;color:#aab8c8}
+.btn-cancel:hover{background:#2a3848}
+.required{color:#c8a951}
+/* Success */
+.success-box{padding:20px 16px;text-align:center}
 .success-box .icon{font-size:2rem;margin-bottom:8px}
-.success-box h3{color:#00c864;font-size:1rem;margin-bottom:6px}
-.success-box p{color:#aab8c8;font-size:.82rem;margin-bottom:16px}
-.success-box a{color:#c8a951;text-decoration:none;font-size:.82rem}
-.error-box{background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.3);border-radius:6px;padding:10px 14px;color:#ff8080;font-size:.8rem;margin-bottom:16px}
-.required{color:#c8a951;margin-left:2px}
-.ftr{background:#0a1420;border-top:1px solid #1c2d42;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;font-size:.72rem;flex-shrink:0}
+.success-box h3{color:#00c864;font-size:.95rem;margin-bottom:6px}
+.success-box p{color:#aab8c8;font-size:.78rem;margin-bottom:14px}
+.success-box a{color:#c8a951;text-decoration:none;font-size:.78rem}
+.error-box{background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.3);border-radius:4px;padding:8px 12px;color:#ff8080;font-size:.75rem;margin-bottom:12px}
+/* Map draw styles */
+.leaflet-draw-toolbar a{background-color:#0a1420!important;color:#c8a951!important;border-color:#1c2d42!important}
+.leaflet-draw-toolbar a:hover{background-color:#1c2d42!important}
+.ftr{background:#0a1420;border-top:1px solid #1c2d42;padding:6px 24px;display:flex;align-items:center;justify-content:space-between;font-size:.72rem;flex-shrink:0}
 .ftr a{color:#6b7d91;text-decoration:none;margin-right:16px}
 .ftr a:hover{color:#c8a951}
 </style>
@@ -55,51 +82,74 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   </nav>
 </header>
 
-<div class="main">
-  <div class="card">
+<div class="wrap">
+  <div id="map"></div>
+  <div class="fb-panel">
+    <div class="fb-title">
+      <h2>📝 Submit Feedback</h2>
+      <p>Draw on the map to mark your location, then fill in the form.</p>
+    </div>
+
     {% if success %}
     <div class="success-box">
       <div class="icon">✅</div>
-      <h3>Thank you for your feedback!</h3>
-      <p>Your feedback has been received and saved. Our team will review it and respond if needed.</p>
-      <a href="/feedback/">Submit another feedback</a> &nbsp;|&nbsp;
-      <a href="/">Return to Home</a>
+      <h3>Thank you!</h3>
+      <p>Your feedback has been received. Our team will review it.</p>
+      <a href="/feedback/">Submit another</a> &nbsp;|&nbsp; <a href="/">Home</a>
     </div>
     {% else %}
-    <div class="card-title">📝 Submit Feedback</div>
-    <div class="card-sub">Help us improve the CCDA GeoPortal — your feedback is valuable to us.</div>
 
-    {% if error %}
-    <div class="error-box">⚠️ {{ error }}</div>
-    {% endif %}
+    <div class="draw-bar">
+      <label>Draw: Mark location on map</label>
+      <div class="draw-btns">
+        <button class="draw-btn" id="btn-point" onclick="startDraw('point')">📍 Point</button>
+        <button class="draw-btn" id="btn-polygon" onclick="startDraw('polygon')">⬡ Polygon</button>
+        <button class="draw-btn clear" onclick="clearDraw()">✕ Clear</button>
+      </div>
+      <div class="draw-hint" id="draw-hint">Click a draw tool, then click on the map</div>
+    </div>
 
-    <form method="POST">
-      {% csrf_token %}
-      <div class="form-row">
+    <div class="fb-form">
+      {% if error %}
+      <div class="error-box">⚠️ {{ error }}</div>
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" id="geometry" name="geometry" value="">
+
         <div class="form-group">
-          <label for="name">Your Name</label>
-          <input type="text" id="name" name="name" placeholder="Optional" maxlength="100">
+          <label>Category <span class="required">*</span></label>
+          <select name="category" required>
+            <option value="general">💬 General Feedback</option>
+            <option value="data_request">📊 Data Request</option>
+            <option value="map_issue">🗺️ Map Issue</option>
+            <option value="bug_report">🐛 Bug Report</option>
+          </select>
         </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" name="name" placeholder="Optional" maxlength="100">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="Optional">
+          </div>
+        </div>
+
         <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" name="email" placeholder="Optional — for reply">
+          <label>Message <span class="required">*</span></label>
+          <textarea name="message" placeholder="Describe your feedback, map issue or data request..." required></textarea>
         </div>
-      </div>
-      <div class="form-group">
-        <label for="category">Category <span class="required">*</span></label>
-        <select id="category" name="category" required>
-          <option value="general">💬 General Feedback</option>
-          <option value="data_request">📊 Data Request</option>
-          <option value="map_issue">🗺️ Map Issue</option>
-          <option value="bug_report">🐛 Bug Report</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="message">Message <span class="required">*</span></label>
-        <textarea id="message" name="message" placeholder="Describe your feedback, issue or data request in detail..." required></textarea>
-      </div>
-      <button type="submit" class="btn-submit">Send Feedback</button>
-    </form>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-cancel" onclick="clearDraw()">Clear</button>
+          <button type="submit" class="btn btn-send">Send Feedback</button>
+        </div>
+      </form>
+    </div>
     {% endif %}
   </div>
 </div>
@@ -113,5 +163,93 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   </div>
   <div style="color:#4a5868">&copy; 2026 CCDA GeoPortal</div>
 </footer>
+
+<script>
+// Init map
+var map = L.map('map', {center:[-6.5,147], zoom:6, zoomControl:false});
+L.control.zoom({position:'bottomright'}).addTo(map);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  {attribution:'Tiles &copy; Esri', maxZoom:18}).addTo(map);
+L.tileLayer.wms('http://192.168.2.16/geoserver/ows', {
+  layers:'geonode:gadm41_PNG_1', styles:'png_provinces',
+  format:'image/png', transparent:true, version:'1.1.1', opacity:0.8
+}).addTo(map);
+
+// Draw layers
+var drawnItems = new L.FeatureGroup().addTo(map);
+var drawControl = null;
+var activeMode = null;
+
+function startDraw(mode) {
+  // Cancel existing
+  if (drawControl) { map.removeControl(drawControl); drawControl = null; }
+  document.getElementById('btn-point').classList.remove('active');
+  document.getElementById('btn-polygon').classList.remove('active');
+
+  if (activeMode === mode) { activeMode = null; document.getElementById('draw-hint').textContent = 'Click a draw tool, then click on the map'; return; }
+  activeMode = mode;
+
+  if (mode === 'point') {
+    document.getElementById('btn-point').classList.add('active');
+    document.getElementById('draw-hint').textContent = 'Click on the map to place a point';
+    drawControl = new L.Draw.Marker(map, {icon: L.divIcon({className:'', html:'<div style="background:#c8a951;width:12px;height:12px;border-radius:50%;border:2px solid #fff"></div>', iconSize:[12,12]})});
+  } else {
+    document.getElementById('btn-polygon').classList.add('active');
+    document.getElementById('draw-hint').textContent = 'Click to add points — double-click last point to finish polygon';
+    drawControl = new L.Draw.Polygon(map, {
+      allowIntersection: false,
+      showArea: false,
+      repeatMode: false,
+      shapeOptions:{color:'#c8a951', fillColor:'#c8a951', fillOpacity:0.2, weight:2},
+      icon: new L.DivIcon({
+        iconSize: new L.Point(8,8),
+        className:'leaflet-div-icon leaflet-editing-icon'
+      }),
+      touchIcon: new L.DivIcon({
+        iconSize: new L.Point(20,20),
+        className:'leaflet-div-icon leaflet-editing-icon leaflet-touch-icon'
+      }),
+      guidelineDistance: 20,
+      maxGuideLineLength: 4000,
+      showLength: false,
+      metric: true,
+      feet: false,
+      nautic: false,
+      finishOn: 'dblclick'
+    });
+  }
+  drawControl.enable();
+}
+
+map.on(L.Draw.Event.CREATED, function(e) {
+  drawnItems.clearLayers();
+  drawnItems.addLayer(e.layer);
+  var geojson = JSON.stringify(e.layer.toGeoJSON());
+  document.getElementById('geometry').value = geojson;
+  document.getElementById('btn-point').classList.remove('active');
+  document.getElementById('btn-polygon').classList.remove('active');
+  activeMode = null;
+  document.getElementById('draw-hint').textContent = '✓ Location marked — fill in the form and send';
+  if (drawControl) { map.removeControl(drawControl); drawControl = null; }
+});
+
+function clearDraw() {
+  drawnItems.clearLayers();
+  document.getElementById('geometry').value = '';
+  if (drawControl) { map.removeControl(drawControl); drawControl = null; }
+  document.getElementById('btn-point').classList.remove('active');
+  document.getElementById('btn-polygon').classList.remove('active');
+  activeMode = null;
+  document.getElementById('draw-hint').textContent = 'Click a draw tool, then click on the map';
+}
+
+// Resize map
+function resizeMap() {
+  document.getElementById('map').style.height = (window.innerHeight - 48 - 32) + 'px';
+  map.invalidateSize();
+}
+resizeMap();
+window.addEventListener('resize', resizeMap);
+</script>
 </body>
 </html>
