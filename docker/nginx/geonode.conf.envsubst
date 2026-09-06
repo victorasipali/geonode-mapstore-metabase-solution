@@ -141,3 +141,37 @@ location / {
       add_header Cache-Control "max-age=31536000, public";
   }
 }
+
+    # Metabase proxy
+    location /metabase/ {
+        proxy_pass http://metabase4my_geonode:3000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 300;
+        client_max_body_size 100M;
+    }
+
+    location = /metabase {
+        return 302 /metabase/;
+    }
+
+    # WMS tile cache
+    location /geoserver/ows {
+        proxy_cache wms_cache;
+        proxy_cache_key "$scheme$request_method$host$request_uri";
+        proxy_cache_valid 200 1h;
+        proxy_cache_valid 404 1m;
+        proxy_cache_bypass $http_pragma;
+        proxy_cache_use_stale error timeout updating;
+        proxy_ignore_headers Cache-Control Expires Set-Cookie;
+        proxy_hide_header Cache-Control;
+        proxy_hide_header Pragma;
+        add_header X-Cache-Status $upstream_cache_status;
+        proxy_pass http://geoserver:8080/geoserver/ows;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_read_timeout 120;
+        client_max_body_size 10M;
+    }

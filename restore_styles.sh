@@ -61,45 +61,4 @@ if added > 0:
 print(f'GeoFence: {added} rules restored')
 " 2>/dev/null
 
-# Restore Metabase nginx proxy config
-echo "Restoring Metabase nginx config..."
-docker exec nginx4my_geonode sh -c 'cat > /etc/nginx/sites-enabled/metabase.conf << "NGINXEOF"
-location /metabase/ {
-    proxy_pass http://metabase4my_geonode:3000/;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_read_timeout 300;
-    client_max_body_size 100M;
-}
 
-location = /metabase {
-    return 302 /metabase/;
-}
-NGINXEOF'
-docker exec nginx4my_geonode nginx -s reload
-echo "Metabase nginx config restored!"
-
-# Restore nginx WMS cache config
-echo "Restoring nginx WMS cache..."
-docker exec nginx4my_geonode sh -c 'grep -q "proxy_cache_path" /etc/nginx/nginx.conf || sed -i "s|resolver 127.0.0.11;|resolver 127.0.0.11;\n    proxy_cache_path /tmp/nginx_wms_cache levels=1:2 keys_zone=wms_cache:10m max_size=500m inactive=60m use_temp_path=off;|" /etc/nginx/nginx.conf'
-docker exec nginx4my_geonode sh -c 'cat > /etc/nginx/sites-enabled/wms_cache.conf << "NGINXEOF"
-location /geoserver/ows {
-    proxy_cache wms_cache;
-    proxy_cache_key "$scheme$request_method$host$request_uri";
-    proxy_cache_valid 200 1h;
-    proxy_cache_valid 404 1m;
-    proxy_cache_bypass $http_pragma;
-    proxy_cache_use_stale error timeout updating;
-    proxy_ignore_headers Cache-Control;
-    add_header X-Cache-Status $upstream_cache_status;
-    proxy_pass http://geoserver:8080/geoserver/ows;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_read_timeout 120;
-    client_max_body_size 10M;
-}
-NGINXEOF'
-docker exec nginx4my_geonode nginx -s reload
-echo "WMS cache restored!"
